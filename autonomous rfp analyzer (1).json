@@ -70,7 +70,7 @@
       "name": "Google Gemini Chat Model",
       "credentials": {
         "googlePalmApi": {
-          "id": "U7ZS2wwGQmQdV8ru",
+          "id": "REDACTED_CREDENTIAL_ID",
           "name": "Google Gemini(PaLM) Api account"
         }
       }
@@ -113,10 +113,10 @@
         "operation": "download",
         "fileId": {
           "__rl": true,
-          "value": "1DbDU_5kj7RmWvmCVEZwiffMT3rALTay_",
+          "value": "REDACTED_FILE_ID",
           "mode": "list",
-          "cachedResultName": "REQUEST FOR PROPOSAL (RFP) Project Name_ Enterprise Automation Pipeline Company_ Global Tech Solutions Date_ January 2026.pdf",
-          "cachedResultUrl": "https://drive.google.com/file/d/1DbDU_5kj7RmWvmCVEZwiffMT3rALTay_/view?usp=drivesdk"
+          "cachedResultName": "REDACTED_FILENAME.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/REDACTED_FILE_ID/view"
         },
         "options": {}
       },
@@ -130,7 +130,7 @@
       "name": "Download file",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "drthwXeG8r1z7BuY",
+          "id": "REDACTED_CREDENTIAL_ID",
           "name": "Google Drive account"
         }
       }
@@ -217,14 +217,14 @@
       "name": "Create a row",
       "credentials": {
         "baserowApi": {
-          "id": "sRXBSVFsIE1YaMWG",
+          "id": "REDACTED_CREDENTIAL_ID",
           "name": "Baserow account"
         }
       }
     },
     {
       "parameters": {
-        "sendTo": "khalid100daysofcode@gmail.com",
+        "sendTo": "REDACTED_EMAIL@example.com",
         "subject": "Approval Required: New RFP Opportunity.",
         "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; border: 1px solid #ddd; padding: 20px; border-radius: 10px;\">\n  <h1 style=\"color: #333;\">🚀 New RFP Approval Required</h1>\n  <p>The AI has analyzed a new RFP and suggests it is a <b>Good Fit</b>.</p>\n\n  <div style=\"background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px;\">\n    <ul style=\"list-style: none; padding: 0;\">\n      <li><b>💰 Budget:</b> {{$json.budget}}</li>\n      <li><b>📅 Deadline:</b> {{$json.deadline}}</li>\n      <li><b>🛠️ Tech Stack:</b> {{ $json.tech_stack.join(\", \") }}</li>\n    </ul>\n    <p><b>💡 AI Reasoning:</b> {{$json.reason}}</p>\n  </div>\n\n  <p>To approve this opportunity and save it to the <b>Baserow Opportunities</b> table, click the button below:</p>\n\n  <a href=\"{{ $execution.resumeUrl }}?status=approve\" \n     style=\"display: inline-block; background-color: #28a745; color: white; padding: 15px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;\">\n     APPROVE & SAVE TO BASEROW\n  </a>\n  \n  <p style=\"font-size: 12px; color: #888; margin-top: 20px;\">\n    Note: Clicking this link will immediately resume the n8n workflow.\n  </p>\n</div>",
         "options": {}
@@ -237,10 +237,10 @@
       ],
       "id": "1d377cd2-9d64-448b-a6f4-d83f5bef3139",
       "name": "Send a message",
-      "webhookId": "a0f37c57-51be-4880-97d3-025d0b1c435a",
+      "webhookId": "REDACTED_WEBHOOK_ID",
       "credentials": {
         "gmailOAuth2": {
-          "id": "j08joJfMCC9vZp0O",
+          "id": "REDACTED_CREDENTIAL_ID",
           "name": "Gmail account"
         }
       }
@@ -258,7 +258,7 @@
       ],
       "id": "3f9e2d02-6528-4252-ac24-c0b85ee62b7b",
       "name": "Wait1",
-      "webhookId": "a880abe7-1e0a-4485-a282-478d987b4cbb"
+      "webhookId": "REDACTED_WEBHOOK_ID"
     },
     {
       "parameters": {
@@ -296,7 +296,7 @@
       "name": "Create a row1",
       "credentials": {
         "baserowApi": {
-          "id": "sRXBSVFsIE1YaMWG",
+          "id": "REDACTED_CREDENTIAL_ID",
           "name": "Baserow account"
         }
       }
@@ -438,10 +438,10 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "09ca4153-7a8f-4441-8b6b-341d24379a47",
+  "versionId": "REDACTED_VERSION_ID",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "4336b145959ff23d3b2c4c1bc598d2c66749dc17c5619b21f80d9eb126a30f47"
+    "instanceId": "REDACTED_INSTANCE_ID"
   },
   "id": "AeHQxuDXENLFkMh4",
   "tags": []
