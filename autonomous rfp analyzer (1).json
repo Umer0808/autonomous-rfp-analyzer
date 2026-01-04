@@ -1,0 +1,448 @@
+{
+  "name": "autonomous rfp analyzer",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "return $json.attachments.map(file => ({\n  json: { fileName: file.fileName, data: file.data }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "c17acb27-046b-4248-9f7f-a00779548556",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "5c775d80-c9a7-4f24-b85e-0e36710de99a",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b30c078a-e134-4f22-8605-1a34c5375702",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "You are an expert RFP Analysis Assistant. Your role is to analyze documents and determine if they represent viable project opportunities.\n\n## Your Tasks\n\n### 1. Document Type Identification\nFirst, determine if the document is a Request for Proposal (RFP), Request for Quote (RFQ), project brief, or other document type seeking development/automation services.\n\n**Valid RFP indicators:**\n- Requests for software development, automation, integration, or technical services\n- Contains project scope, requirements, or deliverables\n- Seeks proposals or bids from service providers\n\n**Invalid documents (NOT RFPs):**\n- Store policies, terms of service, return policies\n- General informational content\n- Marketing materials, blog posts, news articles\n- Internal company documents not seeking external services\n\n### 2. Data Extraction (Only for Valid RFPs)\n\nExtract:\n- **Budget**: Dollar amount, range, or \"Not specified\"\n- **Deadline**: Submission or completion date, or \"Not specified\"  \n- **Tech Stack**: List ALL mentioned technologies (languages, frameworks, platforms, tools)\n\n### 3. Competency Matching\n\n**Our Core Competencies:**\n- n8n (workflow automation, API integration, no-code/low-code automation)\n- Python (scripting, data processing, API development, automation, web scraping, ML/AI)\n\n**Evaluate as `is_good_fit: true` if:**\n- Tech stack explicitly mentions n8n or Python\n- Project involves workflow automation, API integration, or data processing (n8n strengths)\n- Project requires scripting, backend development, or data analysis (Python strengths)\n- Technologies are compatible: REST APIs, webhooks, databases, cloud services\n- Requirements can be effectively delivered using n8n and/or Python\n\n**Evaluate as `is_good_fit: false` if:**\n- Document is not an RFP/project request\n- Tech stack is incompatible: .NET exclusive, Java-only, Swift/Kotlin mobile apps, embedded systems\n- Requires technologies we don't specialize in: React/Vue frontend-only, WordPress, Shopify themes\n- Project scope is outside our expertise: hardware, infrastructure-only, network engineering\n\n## Output Format\n\nReturn ONLY a valid JSON object:\n```json\n{\n  \"document_type\": \"RFP\" | \"Store Policy\" | \"Blog Post\" | \"Other\",\n  \"budget\": \"string\",\n  \"deadline\": \"string\",\n  \"tech_stack\": [\"array\", \"of\", \"strings\"],\n  \"is_good_fit\": true | false,\n  \"reason\": \"Brief explanation for the decision\"\n}\n```\n\n## Important Rules\n\n1. **Be strict about document type**: If it's not requesting services/proposals, it's not an RFP\n2. **For non-RFPs**: Set `is_good_fit: false` and `reason: \"Invalid document type: [type]\"`\n3. **Be accurate with fit assessment**: Don't mark as true unless there's clear alignment\n4. **Empty arrays for non-RFPs**: Use empty string for budget/deadline and empty array for tech_stack\n5. **Concise reasoning**: 1-2 sentences maximum\n\n## Examples\n\n**Example 1 - Store Policy:**\n```json\n{\n  \"document_type\": \"Store Policy\",\n  \"budget\": \"\",\n  \"deadline\": \"\",\n  \"tech_stack\": [],\n  \"is_good_fit\": false,\n  \"reason\": \"Invalid document type: Store Policy - not a project request\"\n}\n```\n\n**Example 2 - Python RFP:**\n```json\n{\n  \"document_type\": \"RFP\",\n  \"budget\": \"$50,000 - $75,000\",\n  \"deadline\": \"March 15, 2024\",\n  \"tech_stack\": [\"Python\", \"Django\", \"PostgreSQL\", \"AWS\"],\n  \"is_good_fit\": true,\n  \"reason\": \"Strong match - Python backend development aligns with core competency\"\n}\n```\n\n**Example 3 - Incompatible RFP:**\n```json\n{\n  \"document_type\": \"RFP\",\n  \"budget\": \"$100,000\",\n  \"deadline\": \"April 30, 2024\",\n  \"tech_stack\": [\"Swift\", \"SwiftUI\", \"iOS\", \"Firebase\"],\n  \"is_good_fit\": false,\n  \"reason\": \"Tech stack requires iOS mobile development, outside our Python/n8n expertise\"\n}\n```"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "32e3fa4a-38cd-4d46-9493-1864ffee1965",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        496,
+        208
+      ],
+      "id": "81cc65a4-dcfd-47b0-89fa-7a0c036a83a0",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "U7ZS2wwGQmQdV8ru",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "61aca47d-d753-46a3-85e2-a865c74d0d2f",
+              "leftValue": "={{ $json.is_good_fit }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        -64
+      ],
+      "id": "871a6962-c39d-4bdc-b90d-881682c59734",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1DbDU_5kj7RmWvmCVEZwiffMT3rALTay_",
+          "mode": "list",
+          "cachedResultName": "REQUEST FOR PROPOSAL (RFP) Project Name_ Enterprise Automation Pipeline Company_ Global Tech Solutions Date_ January 2026.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/1DbDU_5kj7RmWvmCVEZwiffMT3rALTay_/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "9e95bbf9-3094-446f-8002-08f81c2f18ff",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "drthwXeG8r1z7BuY",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// This script parses the AI string and prepares it for Baserow\nconst aiOutput = $input.first().json.output; \n\n// Remove the ```json and ``` markers if they exist\nconst cleanJsonString = aiOutput.replace(/```json|```/g, \"\").trim();\nconst parsedData = JSON.parse(cleanJsonString);\n\nreturn {\n  budget: parsedData.budget,\n  deadline: parsedData.deadline,\n  // This line converts the List [\"n8n\", \"Python\"] into \"n8n, Python\"\n  tech_stack: parsedData.tech_stack.join(\", \"), \n  is_good_fit: parsedData.is_good_fit,\n  reason: parsedData.reason\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        928,
+        48
+      ],
+      "id": "d0a01bdd-0459-4187-9062-e6092c22554a",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3c8da9f0-c6ff-4b0c-9b54-cf0414ad07fb",
+              "leftValue": "={{ $json.query.status }}",
+              "rightValue": "approve",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1952,
+        -160
+      ],
+      "id": "5b880441-2ca0-48ae-9764-3029f30aef83",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "databaseId": 346393,
+        "tableId": 790329,
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": 6740837,
+              "fieldValue": "={{ $('Code in JavaScript1').item.json.budget }}"
+            },
+            {
+              "fieldId": 6740838,
+              "fieldValue": "={{ $('Code in JavaScript1').item.json.deadline }}"
+            },
+            {
+              "fieldId": 6740839,
+              "fieldValue": "={{ $('Code in JavaScript1').item.json.tech_stack }}"
+            },
+            {
+              "fieldId": 6740840,
+              "fieldValue": "={{ $('Code in JavaScript1').item.json.reason }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.baserow",
+      "typeVersion": 1,
+      "position": [
+        2160,
+        -256
+      ],
+      "id": "bf795893-f326-4c3c-9026-6707f4872386",
+      "name": "Create a row",
+      "credentials": {
+        "baserowApi": {
+          "id": "sRXBSVFsIE1YaMWG",
+          "name": "Baserow account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "khalid100daysofcode@gmail.com",
+        "subject": "Approval Required: New RFP Opportunity.",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; border: 1px solid #ddd; padding: 20px; border-radius: 10px;\">\n  <h1 style=\"color: #333;\">🚀 New RFP Approval Required</h1>\n  <p>The AI has analyzed a new RFP and suggests it is a <b>Good Fit</b>.</p>\n\n  <div style=\"background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px;\">\n    <ul style=\"list-style: none; padding: 0;\">\n      <li><b>💰 Budget:</b> {{$json.budget}}</li>\n      <li><b>📅 Deadline:</b> {{$json.deadline}}</li>\n      <li><b>🛠️ Tech Stack:</b> {{ $json.tech_stack.join(\", \") }}</li>\n    </ul>\n    <p><b>💡 AI Reasoning:</b> {{$json.reason}}</p>\n  </div>\n\n  <p>To approve this opportunity and save it to the <b>Baserow Opportunities</b> table, click the button below:</p>\n\n  <a href=\"{{ $execution.resumeUrl }}?status=approve\" \n     style=\"display: inline-block; background-color: #28a745; color: white; padding: 15px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;\">\n     APPROVE & SAVE TO BASEROW\n  </a>\n  \n  <p style=\"font-size: 12px; color: #888; margin-top: 20px;\">\n    Note: Clicking this link will immediately resume the n8n workflow.\n  </p>\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1536,
+        -160
+      ],
+      "id": "1d377cd2-9d64-448b-a6f4-d83f5bef3139",
+      "name": "Send a message",
+      "webhookId": "a0f37c57-51be-4880-97d3-025d0b1c435a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "j08joJfMCC9vZp0O",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1744,
+        -160
+      ],
+      "id": "3f9e2d02-6528-4252-ac24-c0b85ee62b7b",
+      "name": "Wait1",
+      "webhookId": "a880abe7-1e0a-4485-a282-478d987b4cbb"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "databaseId": 346393,
+        "tableId": 790360,
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": 6741114,
+              "fieldValue": "={{ $json.document_type }}"
+            },
+            {
+              "fieldId": 6741115,
+              "fieldValue": "={{ $json.reason }}"
+            },
+            {
+              "fieldId": 6741116,
+              "fieldValue": "={{ $json.budget }}"
+            },
+            {
+              "fieldId": 6741125,
+              "fieldValue": "={{ $json.tech_stack }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.baserow",
+      "typeVersion": 1,
+      "position": [
+        2336,
+        -32
+      ],
+      "id": "04cca3c4-9ea4-4ecf-a172-2007da304a1b",
+      "name": "Create a row1",
+      "credentials": {
+        "baserowApi": {
+          "id": "sRXBSVFsIE1YaMWG",
+          "name": "Baserow account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create a row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "09ca4153-7a8f-4441-8b6b-341d24379a47",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4336b145959ff23d3b2c4c1bc598d2c66749dc17c5619b21f80d9eb126a30f47"
+  },
+  "id": "AeHQxuDXENLFkMh4",
+  "tags": []
+}
